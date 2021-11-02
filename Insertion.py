@@ -1,6 +1,6 @@
 import mysql.connector as mysql
 
-#Second SQL connection to use the required database
+#SQL connection to use the required database
 db = mysql.connect(
     host = "localhost",
     user = "root",
