@@ -1,0 +1,25 @@
+import hashlib
+
+def xor(x, y):
+    return bytes(x[i] ^ y[i] for i in range(min(len(x), len(y))))
+
+def hmacsha1(key,msg):
+
+    keyplus = key+ b'\x00' * (64-len(key))  #b'string' is byte string
+
+    ipad = b'0x36' * 64
+    opad = b'0x5c' * 64 
+
+    Sinner = hashlib.sha1(xor(keyplus,ipad))
+    Sinner.update(msg)
+
+    Souter = hashlib.sha1(xor(keyplus,opad))
+    Souter.update(Sinner.hexdigest())
+    return Souter.hexdigest()
+
+
+k = b'vit'
+msg = b'university'
+
+res = hmacsha1(k,msg)
+print(hashlib.sha1(res).hexdigest())

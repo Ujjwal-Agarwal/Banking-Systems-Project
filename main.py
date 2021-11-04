@@ -1,9 +1,15 @@
 #TO include database model in c++, refer to https://www.notion.so/ujjwalagarwal/Database-Design-560d3ac728bc4661b638ede163025caa
 #Start mysql server before running the program
 
+#main.py is just used for database setup
+'''
+import os
+
+os.system('sudo mysql.server start')
+
+'''
 
 import mysql.connector as mysql
-
 
 #Initial SQL Server Connection
 db = mysql.connect(
@@ -19,6 +25,9 @@ cursor.execute("CREATE DATABASE IF NOT EXISTS pydbtest")
 
 #IMPORT INSERTION FUNCTIONS
 from Insertion import Insert_Customer_Entry
+
+#IMPORT DB FILLOUT FUNCTIONS
+from Fillout import Account_type_Setup
 
 #Second SQL connection to use the required database
 db = mysql.connect(
@@ -50,8 +59,14 @@ cursor.execute("CREATE TABLE IF NOT EXISTS CUSTOMER_TRANSACTION_LOG(CUSTOMER_TRA
 #CREATE THE BANKS TRANSACTION LOG
 cursor.execute("CREATE TABLE IF NOT EXISTS BANK_TRANSACTION_LOG(TRANSACTION_ID VARCHAR(10) PRIMARY KEY,DATE_OF_TRANSACTION DATE,TIME_OF_TRANSACTION VARCHAR(10),AMOUNT_MANIPULATED INT,ACCOUNT_ID VARCHAR(20),CUSTOMER_TRANSACTION_ID INT,TRANSACTION_TYPE CHAR(5),FOREIGN KEY(ACCOUNT_ID) REFERENCES ACCOUNT(ACCOUNT_ID) ON DELETE NO ACTION,FOREIGN KEY(CUSTOMER_TRANSACTION_ID) REFERENCES CUSTOMER_TRANSACTION_LOG(CUSTOMER_TRANSACTION_ID))")
 
+#ACCOUNT_TYPE TABLE INITIALIZATION
+Account_type_Setup()
+
 
 #INSERT ENTRIES INTO THE TABLE
-Insert_Customer_Entry()
+'''Insert_Customer_Entry()''' #USE ANOTHER PROGRAM FOR CUSTOMER INPUT/OUTPUT
+
+
+
 
 db.commit()
