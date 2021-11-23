@@ -1,6 +1,6 @@
 import mysql.connector as mysql
 from Crypto.Cipher import AES
-import base64,random,string,os, base64
+import base64,random,string,os, base64,datetime
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -20,9 +20,10 @@ cursor = db.cursor()
 #VALUE FOR AUTO INCREMENT SEQUENCING IN TABLE
 seqgen = 0
 
+
 def Key_enc_key(passw):
     password = passw.encode()
-
+    #a salt is random data that is used as an additional input to a one-way function that hashes data, a password or passphrase
     salt = b"\xb9\x1f|}'S\xa1\x96\xeb\x154\x04\x88\xf3\xdf\x05"
 
     kdf = PBKDF2HMAC(algorithm=hashes.SHA256(),
@@ -54,28 +55,21 @@ def AES_ENCRYPT(data,key):
     #key = key.encode('utf-8')
     iv = os.urandom(16)
     #iv = iv.encode('utf-8')
-    print(len(key))
     cipher = AES.new(key,AES.MODE_CBC,iv)
     msg = msg_pad(data)
     msg = to_bytes(msg)
-
-
     enc = cipher.encrypt(msg)
-    return enc
+    return iv+enc
     
-
-
-
-def AES_DECRYPT(encd,key,iv):
-    aes = AES.new(key, AES.MODE_CBC, iv)
-    decd = adec.decrypt(encd)
+def AES_DECRYPT(encd,key):
+    iv = encd[:16]
+    newencd = encd[16:]
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    decd = cipher.decrypt(newencd)
     return decd
 
-
-
-
-
 def Insert_Customer_Entry():
+    dump = input("")
     name = input("Insert Customer Name\n")
     Phone = input("Insert Customer Phone Number\n")
     Email = input("Insert Customer Email\n")
@@ -96,27 +90,58 @@ def Insert_Customer_Entry():
 
     # File Encryption Key
     key = ''.join(random.choices(string.ascii_letters+string.digits,k=32))
-    print(key)
 
     #Generating Key Encryption Key KEK
-    kekkey = Key_enc_key(Pass)
-    print("keklen"+str(len(kekkey)))
-    #key = AES_ENCRYPT(key,kekkey)
+    kekkey = Key_enc_key(key)
+    #print("keklen"+str(len(kekkey)))
 
+    encFEK= AES_ENCRYPT(key,kekkey)
+    print(encFEK)
+    #encFEK = encFEK.decode()
+    print(encFEK)
 
     #QUERY, using MYSQL AES_ENCRYPT FUNCTION TO ENCRYPT THE DATA USING THE FEK
     query  = "INSERT INTO CUSTOMER VALUES(%s,aes_encrypt(%s,%s),aes_encrypt(%s,%s),aes_encrypt(%s,%s),%s,%s)"
     
     #VALUE DEF.
-    values = (seqgen,name,key,Phone,key,Email,key,Date_Of_Birth,key)
-    #values = ("NULL","Ujjwal","737393","sdsdwds",'2017-07-08',"12345","va")
-
-    #print(name,Phone,Email,Date_Of_Birth,Pass,Customer_type)
+    values = (seqgen,name,key,Phone,key,Email,key,Date_Of_Birth,encFEK)
     
     #CURSOR EXECUTION
     cursor.execute(query,values)
 
     db.commit()
+
+    ''' STARTING FILLOUT FOR ACCOUNT TABLE'''
+
+    Acc_Type = str(input("ENTER ACCOUNT TYPE(SAV/CRE/DEB) :  "))
+    print(Acc_Type)
+    
+    
+    current_time = datetime.datetime.now() 
+    Acc_Name = name[:3]+Acc_Type+str(current_time.year)
+
+    DOJ = str(current_time.day) +"-"+str(current_time.month)+"-" +str(current_time.year)[2:]
+    print(DOJ)
+    cursor.execute("SELECT CUSTOMER_ID FROM CUSTOMER ORDER BY CUSTOMER_ID DESC LIMIT 1")
+
+    Cust_ID = cursor.fetchone()
+    Cust_ID = Cust_ID[0]
+    print(Cust_ID)
+
+    query1 = "INSERT INTO ACCOUNT VALUES(%s,aes_encrypt(%s,%s),%s,aes_encrypt(%s,%s),%s)"
+    values1 = (seqgen,Acc_Name,key,DOJ,Acc_Type,key,Cust_ID)
+
+    cursor.execute(query1,values1)
+    db.commit()
+
+
+
+
+
+
+
+
+
 
 #Insert_Customer_Entry()
 

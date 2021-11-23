@@ -32,43 +32,34 @@ def Key_enc_key(passw):
                 backend=default_backend())
 
     key = base64.urlsafe_b64encode(kdf.derive(password))
-    print(key)
+    #print(key)
     return key
 
 def AES_ENCRYPT(data,key):
     #key = key.encode('utf-8')
     iv = os.urandom(16)
     #iv = iv.encode('utf-8')
-    print(len(key))
     cipher = AES.new(key,AES.MODE_CBC,iv)
     msg = msg_pad(data)
-    print(msg)
     msg = to_bytes(msg)
-    print(msg)
-
-
     enc = cipher.encrypt(msg)
-    print("bruh")
-    print(enc)
-    print(iv+enc)
     return iv+enc
 
 def AES_DECRYPT(encd,key):
-    print(key)
-    print(encd)
     iv = encd[:16]
-    print(iv)
     newencd = encd[16:]
-    print(newencd)
     cipher = AES.new(key, AES.MODE_CBC, iv)
+    print(newencd)
     decd = cipher.decrypt(newencd)
+    print(decd)
     return decd
 
 
 #Generating Key Encryption Key KEK
 kekkey = Key_enc_key("PASSWORD123")
-print("keklen"+str(len(kekkey)))
+#print("keklen"+str(len(kekkey)))
 encd = AES_ENCRYPT("LOSSANTOS",kekkey)
+print(encd)
 
 temp = AES_DECRYPT(encd,kekkey)
 temp = temp.decode()

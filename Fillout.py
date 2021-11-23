@@ -24,18 +24,8 @@ def Account_type_Setup():
     query3 = "INSERT INTO ACCOUNT_TYPE(ACCOUNT_TYPE,DESCRIPTION) VALUES(%s,%s)"
     values3 = ("DEB","Debit Account")
     cursor.execute(query3,values3)
-    db.commit()
+    db.commit()    
 
 
-    
-
-
-def Account_Setup():
-    yy = datetime.now().year
-    #print(yy)
-    
-    
-
-Account_Setup()
 
 
