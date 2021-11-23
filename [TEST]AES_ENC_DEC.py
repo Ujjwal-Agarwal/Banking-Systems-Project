@@ -56,7 +56,8 @@ def AES_DECRYPT(encd,key):
 
 
 #Generating Key Encryption Key KEK
-kekkey = Key_enc_key("PASSWORD123")
+Fkey = ''.join(random.choices(string.ascii_letters+string.digits,k=32))
+kekkey = Key_enc_key("QWERTY")
 #print("keklen"+str(len(kekkey)))
 encd = AES_ENCRYPT("LOSSANTOS",kekkey)
 print(encd)

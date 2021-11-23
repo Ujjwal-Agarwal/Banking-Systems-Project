@@ -92,12 +92,9 @@ def Insert_Customer_Entry():
     key = ''.join(random.choices(string.ascii_letters+string.digits,k=32))
 
     #Generating Key Encryption Key KEK
-    kekkey = Key_enc_key(key)
-    #print("keklen"+str(len(kekkey)))
-
+    kekkey = Key_enc_key(Pass)
+    
     encFEK= AES_ENCRYPT(key,kekkey)
-    print(encFEK)
-    #encFEK = encFEK.decode()
     print(encFEK)
 
     #QUERY, using MYSQL AES_ENCRYPT FUNCTION TO ENCRYPT THE DATA USING THE FEK
@@ -114,33 +111,24 @@ def Insert_Customer_Entry():
     ''' STARTING FILLOUT FOR ACCOUNT TABLE'''
 
     Acc_Type = str(input("ENTER ACCOUNT TYPE(SAV/CRE/DEB) :  "))
-    print(Acc_Type)
     
     
     current_time = datetime.datetime.now() 
     Acc_Name = name[:3]+Acc_Type+str(current_time.year)
+    print("Your Account Name is: "+ Acc_Name)
 
     DOJ = str(current_time.day) +"-"+str(current_time.month)+"-" +str(current_time.year)[2:]
-    print(DOJ)
     cursor.execute("SELECT CUSTOMER_ID FROM CUSTOMER ORDER BY CUSTOMER_ID DESC LIMIT 1")
 
     Cust_ID = cursor.fetchone()
     Cust_ID = Cust_ID[0]
-    print(Cust_ID)
+    print("Your Customer ID is: "+str(Cust_ID))
 
     query1 = "INSERT INTO ACCOUNT VALUES(%s,aes_encrypt(%s,%s),%s,aes_encrypt(%s,%s),%s)"
     values1 = (seqgen,Acc_Name,key,DOJ,Acc_Type,key,Cust_ID)
 
     cursor.execute(query1,values1)
     db.commit()
-
-
-
-
-
-
-
-
 
 
 #Insert_Customer_Entry()
