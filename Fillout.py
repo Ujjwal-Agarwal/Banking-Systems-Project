@@ -33,4 +33,9 @@ def Account_type_Setup():
 def Account_Setup():
     yy = datetime.now().year
     #print(yy)
+    
+    
+
+Account_Setup()
+
 
