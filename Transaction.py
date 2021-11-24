@@ -1,5 +1,7 @@
 import mysql.connector as mysql
+from pyotp import totp
 from Insertion import AES_ENCRYPT,AES_DECRYPT, Key_enc_key
+import os, pyotp,base64
 
 #SQL connection to use the required database
 db = mysql.connect(
@@ -12,7 +14,7 @@ db = mysql.connect(
 #Cursor initialized to use the current connection
 cursor = db.cursor()
 
-def Transaction():
+def Authentication():
     Account_Name = input("ENTER ACCOUNT NAME: ")
     Cust_ID = str(input("ENTER CUSTOMER ID: "))
     Pass = input("ENTER PASSWORD: ")
@@ -20,33 +22,51 @@ def Transaction():
     query = "SELECT USER_PASSWORD FROM CUSTOMER WHERE CUSTOMER_ID= " + Cust_ID
     cursor.execute(query)
     encFEK = cursor.fetchone()
-    print(encFEK)
     encFEK = encFEK[0]
-    print(encFEK)
 
     KEK = Key_enc_key(Pass)
-    print("KEK")
-    print(KEK)
 
     FEK = AES_DECRYPT(encFEK,KEK)
     FEK = FEK.decode()
-    print("FEK")
-    print(FEK)
 
-    query = "SELECT EMAIL FROM CUSTOMER WHERE CUSTOMER_ID = " + Cust_ID
+    query = "SELECT CAST(AES_DECRYPT(ACCOUNT_NAME," +"'" + FEK + "'"+ ") AS CHAR) FROM ACCOUNT WHERE CUSTOMER_ID = " + Cust_ID
     cursor.execute(query)
-    EMAIL = cursor.fetchone()
-    print("ENCRYPTED EMAIL")
-    print(EMAIL)
-    query = "SELECT CAST(AES_DECRYPT(EMAIL," +"'" + FEK + "'"+ ") AS CHAR) FROM CUSTOMER WHERE CUSTOMER_ID = " + Cust_ID
+    Acc_Name_Auth = cursor.fetchone()
+    Acc_Name_Auth = Acc_Name_Auth[0]
+    print(Acc_Name_Auth)
+
+    if(Acc_Name_Auth!= Account_Name):
+        #os.system('cls' if os.name == 'nt' else 'clear')
+        print("WRONG ACCOUNT!")
+        quit()
+
+    '''OTP System'''
+
+    query = "SELECT CAST(AES_DECRYPT(TOTP_KEY,"+ "'" + FEK + "'" +") AS CHAR) FROM AUTH WHERE CUSTOMER_ID = " + Cust_ID
+    cursor.execute(query)
+    TOTP_KEY = cursor.fetchone()
+    TOTP_KEY = TOTP_KEY[0]
+
+    totp = pyotp.TOTP(base64.b32encode(bytearray(TOTP_KEY,'ascii')).decode('utf-8'))
+    
+    TOTP_VERIFY = input("ENTER THE KEY FROM YOUR AUTHENTICATOR APP :")
+    
+    if totp.verify(TOTP_VERIFY) !=True:
+        print("WRONG AUTHENTICATION KEY!")
+        quit()
+    
+
+    print("AUTHENTICATION SUCCESS!")
+    return True
+
+
+    '''query = "SELECT CAST(AES_DECRYPT(EMAIL," +"'" + FEK + "'"+ ") AS CHAR) FROM CUSTOMER WHERE CUSTOMER_ID = " + Cust_ID
     cursor.execute(query)
     EMAIL2 = cursor.fetchone()
-    print("EMAIL")
-    print(EMAIL2)
+    print(EMAIL2)'''
+
+Authentication()
 
 
 
-
-
-Transaction()
 

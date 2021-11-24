@@ -111,6 +111,7 @@ def Insert_Customer_Entry():
     ''' STARTING FILLOUT FOR ACCOUNT TABLE'''
 
     Acc_Type = str(input("ENTER ACCOUNT TYPE(SAV/CRE/DEB) :  "))
+    Balance = input("ENTER INITIAL BALANCE: ")
     
     
     current_time = datetime.datetime.now() 
@@ -124,11 +125,29 @@ def Insert_Customer_Entry():
     Cust_ID = Cust_ID[0]
     print("Your Customer ID is: "+str(Cust_ID))
 
-    query1 = "INSERT INTO ACCOUNT VALUES(%s,aes_encrypt(%s,%s),%s,aes_encrypt(%s,%s),%s)"
-    values1 = (seqgen,Acc_Name,key,DOJ,Acc_Type,key,Cust_ID)
+    query1 = "INSERT INTO ACCOUNT VALUES(%s,aes_encrypt(%s,%s),%s,aes_encrypt(%s,%s),%s,aes_encrypt(%s,%s))"
+    values1 = (seqgen,Acc_Name,key,DOJ,Acc_Type,key,Cust_ID,Balance,key)
 
     cursor.execute(query1,values1)
     db.commit()
+
+    totp_key = ''.join(random.choices(string.ascii_letters+string.digits,k=10))
+    print("Your 2FA Key iS: " + totp_key)
+
+    cursor.execute("SELECT CUSTOMER_ID FROM CUSTOMER ORDER BY CUSTOMER_ID DESC LIMIT 1")
+    Cust_ID = cursor.fetchone()
+    Cust_ID = Cust_ID[0]
+
+    query2 = "INSERT INTO AUTH VALUES(%s,aes_encrypt(%s,%s))"
+    values2 = (Cust_ID,totp_key,key)
+
+    cursor.execute(query2,values2)
+    db.commit()
+
+
+
+
+
 
 
 #Insert_Customer_Entry()
