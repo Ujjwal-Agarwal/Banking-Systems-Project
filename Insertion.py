@@ -1,6 +1,6 @@
 import mysql.connector as mysql
 from Crypto.Cipher import AES
-import base64,random,string,os, base64,datetime
+import base64,random,string,os, base64,datetime,pyotp
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -131,6 +131,7 @@ def Insert_Customer_Entry():
     cursor.execute(query1,values1)
     db.commit()
 
+    #TOTP-KEY
     totp_key = ''.join(random.choices(string.ascii_letters+string.digits,k=10))
     print("Your 2FA Key iS: " + totp_key)
 
@@ -140,15 +141,9 @@ def Insert_Customer_Entry():
 
     query2 = "INSERT INTO AUTH VALUES(%s,aes_encrypt(%s,%s))"
     values2 = (Cust_ID,totp_key,key)
-
+    
     cursor.execute(query2,values2)
     db.commit()
-
-
-
-
-
-
 
 #Insert_Customer_Entry()
 
