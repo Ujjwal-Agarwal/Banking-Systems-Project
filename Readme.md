@@ -2,6 +2,11 @@
 
 # ATM-EMULATION CRYPTOGRAPHY PROJECT
 
+## INSTRUCTIONS
+
+- Run Client.py for Withdrawal,Balance_Add,Balance_check
+- Run Adminstrator.py for Creating new Accounts
+
 ## DEMO SCREENSHOTS
 
 ### ADMINSTRATOR
