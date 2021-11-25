@@ -1,4 +1,7 @@
 from Insertion import *
+import os
+
+os.system('cls' if os.name == 'nt' else 'clear')
 
 print("ADMINSTRATION!\n")
 print("OPTIONS: \n")

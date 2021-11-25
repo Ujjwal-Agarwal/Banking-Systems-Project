@@ -28,7 +28,7 @@ def Authentication():
 
     FEK = AES_DECRYPT(encFEK,KEK)
     FEK = FEK.decode('utf-8')
-    print(FEK)
+    #print(FEK)
 
     query = "SELECT CAST(AES_DECRYPT(ACCOUNT_NAME," +"'" + FEK + "'"+ ") AS CHAR) FROM ACCOUNT WHERE CUSTOMER_ID = " + Cust_ID
     cursor.execute(query)
@@ -37,7 +37,7 @@ def Authentication():
     
 
     if(Acc_Name_Auth!= Account_Name):
-        #os.system('cls' if os.name == 'nt' else 'clear')
+        os.system('cls' if os.name == 'nt' else 'clear')
         print("WRONG ACCOUNT!")
         quit()
 

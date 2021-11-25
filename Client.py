@@ -1,4 +1,7 @@
 from Transaction import *
+import os
+
+os.system('cls' if os.name == 'nt' else 'clear')
 
 print("ATM!\n\n")
 print("OPTIONS: \n")
