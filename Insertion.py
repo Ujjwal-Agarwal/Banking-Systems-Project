@@ -95,7 +95,7 @@ def Insert_Customer_Entry():
     kekkey = Key_enc_key(Pass)
     
     encFEK= AES_ENCRYPT(key,kekkey)
-    print(encFEK)
+    #print(encFEK)
 
     #QUERY, using MYSQL AES_ENCRYPT FUNCTION TO ENCRYPT THE DATA USING THE FEK
     query  = "INSERT INTO CUSTOMER VALUES(%s,aes_encrypt(%s,%s),aes_encrypt(%s,%s),aes_encrypt(%s,%s),%s,%s)"

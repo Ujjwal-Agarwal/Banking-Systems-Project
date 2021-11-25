@@ -27,7 +27,8 @@ def Authentication():
     KEK = Key_enc_key(Pass)
 
     FEK = AES_DECRYPT(encFEK,KEK)
-    FEK = FEK.decode()
+    FEK = FEK.decode('utf-8')
+    print(FEK)
 
     query = "SELECT CAST(AES_DECRYPT(ACCOUNT_NAME," +"'" + FEK + "'"+ ") AS CHAR) FROM ACCOUNT WHERE CUSTOMER_ID = " + Cust_ID
     cursor.execute(query)
@@ -36,7 +37,7 @@ def Authentication():
     
 
     if(Acc_Name_Auth!= Account_Name):
-        os.system('cls' if os.name == 'nt' else 'clear')
+        #os.system('cls' if os.name == 'nt' else 'clear')
         print("WRONG ACCOUNT!")
         quit()
 
@@ -77,8 +78,12 @@ def Balance_update(chan,mode):
     BALANCE = int(BALANCE)
 
     if mode == 'W':
-        BALANCE = BALANCE - chan
-        print("DEDUCTED AMOUNT: "+str(chan))
+        if BALANCE>chan:  
+            BALANCE = BALANCE - chan
+            print("DEDUCTED AMOUNT: "+str(chan))
+        else:
+            print("INSUFFICIENT BALANCE!")
+            return
     elif mode == "D":
         BALANCE = BALANCE + chan
         print("ADDED AMOUNT: "+str(chan))
@@ -92,4 +97,20 @@ def Balance_update(chan,mode):
     cursor.execute(query1,values1)
     db.commit()
 
-Balance_update(2000,'W')
+
+def BalanceCheck():
+    (AuthStatus,FEK,Cust_ID) = Authentication()
+
+    if AuthStatus!= True:
+        print("AUTHENTICATION FAILURE")
+        quit()
+    
+    query = "SELECT CAST(AES_DECRYPT(BALANCE,"+ "'" + FEK + "'" +")AS CHAR) FROM ACCOUNT WHERE CUSTOMER_ID = " + Cust_ID
+    cursor.execute(query)
+    BALANCE = cursor.fetchone()
+    BALANCE = BALANCE[0]
+    print("CURRENT BALANACE: "+BALANCE)
+    
+
+
+    
