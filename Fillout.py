@@ -1,3 +1,5 @@
+'''References https://www.w3schools.com/python/python_mysql_getstarted.asp and SQL'''
+
 from datetime import datetime
 import mysql.connector as mysql
 
@@ -12,6 +14,8 @@ db = mysql.connect(
 #Cursor initialized to use the current connection
 cursor = db.cursor()
 
+
+#JUST CREATES THE ACCOUNT TYPES
 def Account_type_Setup():
     query1 = "INSERT INTO ACCOUNT_TYPE(ACCOUNT_TYPE,DESCRIPTION) VALUES(%s,%s)"
     values1 = ("SAV","Savings Account")

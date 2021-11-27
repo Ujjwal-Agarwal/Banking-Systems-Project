@@ -14,5 +14,3 @@ if CHOICE==1:
 else:
     print("WRONG CHOICE!!!")
     quit()
-
-
